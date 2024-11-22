@@ -1,0 +1,1 @@
+My .config/nvim configuration files written in Lua. I tried using some Neovim starter like AstroVim or kickstarter, but in the end I started coding my own from scratch using examples that I found useful.
