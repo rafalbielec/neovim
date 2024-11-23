@@ -210,6 +210,9 @@ hi link Float	Constant
 hi Identifier	guifg=#ffcc00	guibg=bg	gui=NONE
 hi Function	guifg=#ffcc00	guibg=bg	gui=NONE
 
+hi Cmp	guifg=#ffcc00	guibg=#229966	gui=NONE
+hi CmpLine	guifg=#000000	guibg=#bdffbd	gui=NONE
+
 hi Statement	guifg=#ff9900	guibg=bg	gui=NONE
 hi link Conditional	Statement
 hi link Repeat	Statement

@@ -1,8 +1,8 @@
 -- vimscript settings
 vim.cmd([[
-set shortmess=A " disable swap files
-set notimeout " no keys timeout
-set encoding=utf-8 " default encoding for everything
+set shortmess=A	    " disable swap files
+set notimeout	    " no keys timeout
+set encoding=utf-8  " default encoding for everything
 
 " configure colourful cursor for some terminals
 set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
@@ -25,7 +25,7 @@ vim.opt.smarttab = true
 vim.opt.signcolumn = "yes"
 
 -- Decrease update time
-vim.opt.updatetime = 1000
+vim.opt.updatetime = 700
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
@@ -68,7 +68,3 @@ vim.opt.showmode = true
 vim.schedule(function()
 	vim.opt.clipboard = "unnamedplus"
 end)
-
--- Display a vertical bar at 80 characters
-vim.opt.colorcolumn = "80"
-vim.cmd([[hi colorcolumn guibg='Green']])

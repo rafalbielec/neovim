@@ -2,6 +2,27 @@ require("mini.icons").setup()
 require("mini.git").setup()
 require("mini.diff").setup()
 require("mini.statusline").setup()
+require("mini.comment").setup()
+require("mini.splitjoin").setup({
+	mappings = {
+		toggle = "<leader>T",
+		split = "<leader>S",
+		join = "<leader>J",
+	},
+	detect = {
+		-- Array of Lua patterns to detect region with arguments.
+		-- Default: { '%b()', '%b[]', '%b{}' }
+		brackets = nil,
+
+		-- String Lua pattern defining argument separator
+		separator = ",",
+
+		-- Array of Lua patterns for sub-regions to exclude separators from.
+		-- Enables correct detection in presence of nested brackets and quotes.
+		-- Default: { '%b()', '%b[]', '%b{}', '%b""', "%b''" }
+		exclude_regions = nil,
+	},
+})
 
 local builtin_actions = function()
 	return {

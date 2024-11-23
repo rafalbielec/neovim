@@ -39,12 +39,23 @@ local function getcap()
 		},
 	})
 
+	capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+
 	return capabilities
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
 	callback = function(event)
+		local bufnr = event.buf
+		local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+		if client and vim.tbl_contains({ "null-ls" }, client.name) then
+			return
+		end
+
+		require("lsp_signature").on_attach({}, bufnr)
+
 		local map = function(keys, func, desc, mode)
 			mode = mode or "n"
 			vim.keymap.set(mode, keys, func, { silent = true, buffer = event.buf, desc = "[L]SP: " .. desc })
@@ -60,7 +71,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		map("<leader>lr", vim.lsp.buf.references, "references")
 		map("<leader>ln", vim.lsp.buf.rename, "rename")
 
-		local client = vim.lsp.get_client_by_id(event.data.client_id)
 		if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
 			-- Show inlay_hint by default unless in Insert mode
 			vim.lsp.inlay_hint.enable(true)
@@ -121,6 +131,40 @@ lsp.lemminx.setup({
 	cmd = { "lemminx-osx-aarch_64" },
 })
 
+lsp.html.setup({
+	capabilities = getcap(),
+	filetypes = { "html" },
+})
+
+require("tailwind-tools").setup({
+	capabilities = getcap(),
+})
+
+lsp.cssls.setup({
+	capabilities = getcap(),
+	settings = {
+		css = {
+			validate = true,
+			lint = {
+				unknownAtRules = "ignore",
+			},
+		},
+		less = {
+			validate = true,
+			lint = {
+				unknownAtRules = "ignore",
+			},
+		},
+		scss = {
+			validate = true,
+			lint = {
+				unknownAtRules = "ignore",
+			},
+		},
+	},
+	filetypes = { "css", "scss", "less", "sass" },
+})
+
 lsp.lua_ls.setup({
 	capabilities = getcap(),
 	on_init = function(client)
@@ -140,7 +184,9 @@ lsp.lua_ls.setup({
 			completion = {
 				callSnippet = "Replace",
 			},
-			-- diagnostics = { disable = { 'missing-fields' } },
+			diagnostics = {
+				disable = { "redundant-parameter" },
+			},
 		},
 	},
 })
@@ -158,7 +204,6 @@ lsp.biome.setup({
 	single_file_support = false,
 	filetypes = {
 		"astro",
-		"css",
 		"graphql",
 		"javascript",
 		"javascriptreact",

@@ -12,7 +12,6 @@ require("conform").setup({
 	format_on_save = function(bufnr)
 		local disable_filetypes = {
 			astro = true,
-			html = true,
 			markdown = true,
 			md = true,
 		}
