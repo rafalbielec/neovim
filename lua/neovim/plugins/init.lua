@@ -17,17 +17,21 @@ require("paq")({
 	{ "tpope/vim-sleuth" }, -- Detect tabstop and shiftwidth automatically
 	{ "MeanderingProgrammer/render-markdown.nvim" },
 	{ "sharkdp/fd" },
+	{ "maxmellon/vim-jsx-pretty" },
 
 	-- mini plugins
 	{ "echasnovski/mini.nvim", branch = "main" },
+	{ "windwp/windline.nvim" },
 
 	-- LSP
 	{ "neovim/nvim-lspconfig" },
 	{ "seblj/roslyn.nvim" },
 	{ "stevearc/conform.nvim" },
 	{ "luckasRanarison/tailwind-tools.nvim", build = ":UpdateRemotePlugins" },
+	{ "pmizio/typescript-tools.nvim" },
 	{ "onsails/lspkind-nvim" },
 	{ "ray-x/lsp_signature.nvim" },
+	{ "wuelnerdotexe/vim-astro" },
 
 	-- code completion via cmp
 	{ "rafalbielec/nvim-cmp" }, -- removes the markdown from the LSP pop-up
@@ -45,3 +49,4 @@ require("neovim.plugins.lsp")
 require("neovim.plugins.mini-setup")
 require("neovim.plugins.cmp")
 require("neovim.plugins.hop")
+require("neovim.plugins.statusline")
