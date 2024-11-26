@@ -146,13 +146,12 @@ basic.section_z = {
 				{ sep.left_filled, state.mode[2] .. "Sep" },
 				{ "", state.mode[2] },
 				{ b_components.progress_lua },
-				{ " " },
 				{ b_components.line_col_lua },
 			}
 		end
 		return {
 			{ sep.left_filled, state.mode[2] .. "Sep" },
-			{ " ", state.mode[2] },
+			{ "  ", state.mode[2] },
 			{ b_components.line_col_lua, state.mode[2] },
 		}
 	end,
