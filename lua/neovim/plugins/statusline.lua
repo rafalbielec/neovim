@@ -98,8 +98,8 @@ basic.section_c = {
 	text = function()
 		return {
 			{ " ", state.mode[2] },
-			{ b_components.cache_file_name("[No Name]", "unique") },
-			{ " " },
+			-- { b_components.cache_file_name("[No Name]", "unique") },
+			{ vim.fn.expand("%:p") },
 			{ sep.right_filled, state.mode[2] .. "Sep" },
 		}
 	end,
