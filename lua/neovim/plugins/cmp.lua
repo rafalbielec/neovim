@@ -5,7 +5,7 @@ require("cmp").setup({
 		expand = function() end,
 	},
 	completion = {
-		autocomplete = false, -- auto show cmp
+		autocomplete = { require("cmp.types").cmp.TriggerEvent.InsertEnter },
 		completeopt = "menu,menuone,popup,fuzzy,noselect,noinsert",
 	},
 	preselect = cmp.PreselectMode.None,
@@ -44,16 +44,15 @@ require("cmp").setup({
 		format = require("lspkind").cmp_format({
 			before = require("tailwind-tools.cmp").lspkind_format,
 			menu = {
-				buffer = "﬘",
-				nvim_lsp = "愈",
-				nvim_lsp_signature_help = "",
-				path = "⛕",
-				-- cody = "ೱ",
-				treesitter = "",
-				latext_symbols = "",
-				tailwindcss = "𝓒𝓢𝓢",
-				-- js = " "
-				rg = ">_",
+				buffer = "buf",
+				nvim_lsp = "lsp",
+				nvim_lsp_signature_help = "sign",
+				path = "path",
+				treesitter = "tree",
+				latext_symbols = "lxt",
+				tailwindcss = "tw",
+				js = " ",
+				rg = "rg",
 			},
 		}),
 	},

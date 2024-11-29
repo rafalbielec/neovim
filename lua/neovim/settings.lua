@@ -8,6 +8,10 @@ require("conform").setup({
 		lua = { "stylua" },
 		css = { "biome" },
 		json = { "biome" },
+		typescript = { "biome" },
+		typescriptreact = { "biome" },
+		javascript = { "biome" },
+		javascriptreact = { "biome" },
 	},
 	format_on_save = function(bufnr)
 		local disable_filetypes = {

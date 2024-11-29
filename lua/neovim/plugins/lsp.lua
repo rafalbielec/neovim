@@ -1,4 +1,5 @@
 local lsp = require("lspconfig")
+local util = require("lspconfig/util")
 
 -- lsp hints
 local signs = { Error = "", Warn = "", Hint = "", Info = "" }
@@ -108,9 +109,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
 				callback = function(event2)
 					vim.lsp.buf.clear_references()
-					vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = event2.buf })
-					vim.api.nvim_del_autocmd(cmd1)
-					vim.api.nvim_del_autocmd(cmd2)
+					pcall(function()
+						vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = event2.buf })
+						vim.api.nvim_del_autocmd(cmd1)
+						vim.api.nvim_del_autocmd(cmd2)
+					end)
 				end,
 			})
 		end
@@ -139,23 +142,41 @@ lsp.html.setup({
 
 require("tailwind-tools").setup({
 	capabilities = getcap(),
+	root_dir = function(fname)
+		return util.root_pattern("tailwind.config.mjs")(fname)
+	end,
 })
 
-vim.g.markdown_fenced_languages = {
-	"ts=typescript",
-}
+local function root_pattern_excludes(opt)
+	local root = opt.root
+	local exclude = opt.exclude
 
-require("lspconfig").denols.setup({})
+	local function matches(path, pattern)
+		return 0 < #vim.fn.glob(util.path.join(path, pattern))
+	end
 
--- npm install -g typescript-language-server typescript
+	return function(startpath)
+		return util.search_ancestors(startpath, function(path)
+			return matches(path, root) and not matches(path, exclude)
+		end)
+	end
+end
+
+lsp.denols.setup({
+	capabilities = getcap(),
+	root_dir = root_pattern_excludes({
+		root = "deno.json",
+		exclude = "package.json",
+	}),
+})
 
 require("typescript-tools").setup({
 	capabilities = getcap(),
 	single_file_support = false,
-	root_dir = function(fname)
-		local util = require("lspconfig.util")
-		return util.root_pattern("package.json", "tsconfig.json")(fname)
-	end,
+	root_dir = root_pattern_excludes({
+		root = "package.json",
+		exclude = "deno.json",
+	}),
 	settings = {
 		-- spawn additional tsserver instance to calculate diagnostics on it
 		separate_diagnostic_server = true,
@@ -263,7 +284,6 @@ lsp.lua_ls.setup({
 lsp.biome.setup({
 	cmd = { "biome", "lsp-proxy" },
 	root_dir = function(fname)
-		local util = require("lspconfig.util")
 		return util.root_pattern("biome.json", "biome.jsonc")(fname)
 			or util.find_package_json_ancestor(fname)
 			or util.find_node_modules_ancestor(fname)
@@ -290,7 +310,7 @@ require("roslyn").setup({
 	filewatching = true,
 	exe = {
 		"dotnet",
-		"/Users/personal/lsp/roslyn/Microsoft.CodeAnalysis.LanguageServer.dll",
+		"/Users/raf/lsp/roslyn/Microsoft.CodeAnalysis.LanguageServer.dll",
 	},
 	args = { "--logLevel=Warning", "--extensionLogDirectory=" .. vim.fs.dirname(vim.lsp.get_log_path()) },
 	config = {

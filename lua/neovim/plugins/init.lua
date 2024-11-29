@@ -34,6 +34,7 @@ require("paq")({
 	{ "wuelnerdotexe/vim-astro" },
 
 	-- code completion via cmp
+	-- { "hrsh7th/nvim-cmp" },
 	{ "rafalbielec/nvim-cmp" }, -- removes the markdown from the LSP pop-up
 	{ "hrsh7th/cmp-buffer" },
 	{ "hrsh7th/cmp-path" },
