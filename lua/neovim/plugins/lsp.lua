@@ -224,7 +224,6 @@ require("typescript-tools").setup({
 
 -- npm install -g @astrojs/language-server
 lsp.astro.setup({
-
 	capabilities = getcap(),
 	filetypes = { "astro" },
 })

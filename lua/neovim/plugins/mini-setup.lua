@@ -3,6 +3,7 @@ require("mini.git").setup()
 require("mini.diff").setup()
 require("mini.comment").setup()
 require("mini.indentscope").setup()
+
 require("mini.splitjoin").setup({
 	mappings = {
 		toggle = "<leader>T",

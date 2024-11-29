@@ -1,7 +1,5 @@
 -- General settings
 
-vim.g.editorconfig = true
-
 require("conform").setup({
 	notify_on_error = true,
 	formatters_by_ft = {

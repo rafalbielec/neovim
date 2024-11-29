@@ -16,7 +16,6 @@ require("cmp").setup({
 		},
 		documentation = {
 			border = "rounded",
-			-- winhighlight = "Normal:Cmp",
 		},
 	},
 	mapping = cmp.mapping.preset.insert({
