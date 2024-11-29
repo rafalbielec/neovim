@@ -66,5 +66,5 @@ vim.opt.mouse = "a"
 vim.opt.showmode = true
 -- Enable clipbowrd
 vim.schedule(function()
-	vim.opt.clipboard = "unnamedplus"
+	vim.opt.clipboard = "unnamed"
 end)

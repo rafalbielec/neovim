@@ -18,6 +18,8 @@ require("paq")({
 	{ "MeanderingProgrammer/render-markdown.nvim" },
 	{ "sharkdp/fd" },
 	{ "maxmellon/vim-jsx-pretty" },
+	{ "karb94/neoscroll.nvim" },
+	{ "sphamba/smear-cursor.nvim" },
 
 	-- mini plugins
 	{ "echasnovski/mini.nvim", branch = "main" },
