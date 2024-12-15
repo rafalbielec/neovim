@@ -33,6 +33,7 @@ require("paq")({
 	{ "pmizio/typescript-tools.nvim" },
 	{ "onsails/lspkind-nvim" },
 	{ "ray-x/lsp_signature.nvim" },
+	{ "Dan7h3x/signup.nvim" },
 	{ "wuelnerdotexe/vim-astro" },
 
 	-- code completion via cmp

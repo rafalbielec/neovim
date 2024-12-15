@@ -29,6 +29,10 @@ require("telescope").setup({
 			"%.out",
 			"%.pdf",
 			"%.zip",
+			"%.jpg",
+			"%.png",
+			"%.webp",
+			"%.gif",
 			".DS_Store",
 			-- Directories
 			".vscode",

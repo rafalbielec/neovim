@@ -45,81 +45,6 @@ local function getcap()
 	return capabilities
 end
 
-vim.api.nvim_create_autocmd("LspAttach", {
-	group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
-	callback = function(event)
-		local bufnr = event.buf
-		local client = vim.lsp.get_client_by_id(event.data.client_id)
-
-		if client and vim.tbl_contains({ "null-ls" }, client.name) then
-			return
-		end
-
-		require("lsp_signature").on_attach({}, bufnr)
-
-		local map = function(keys, func, desc, mode)
-			mode = mode or "n"
-			vim.keymap.set(mode, keys, func, { silent = true, buffer = event.buf, desc = "[L]SP: " .. desc })
-		end
-
-		map("<leader>ls", vim.lsp.buf.signature_help, "signature")
-		map("<leader>lh", vim.lsp.buf.hover, "hover")
-		map("<leader>lf", vim.lsp.buf.format, "format")
-		map("<leader>la", vim.lsp.buf.code_action, "code action")
-		map("<leader>le", vim.lsp.buf.definition, "definition")
-		map("<leader>lc", vim.lsp.buf.declaration, "declaration")
-		map("<leader>lt", vim.lsp.buf.type_definition, "type inspection")
-		map("<leader>li", vim.lsp.buf.implementation, "implementation")
-		map("<leader>lr", vim.lsp.buf.references, "references")
-		map("<leader>ln", vim.lsp.buf.rename, "rename")
-
-		if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-			-- Show inlay_hint by default unless in Insert mode
-			vim.lsp.inlay_hint.enable(true)
-
-			local cmd1 = vim.api.nvim_create_autocmd({ "InsertEnter" }, {
-				callback = function()
-					vim.lsp.inlay_hint.enable(false)
-				end,
-			})
-
-			local cmd2 = vim.api.nvim_create_autocmd({ "InsertLeavePre" }, {
-				callback = function()
-					vim.lsp.inlay_hint.enable(true)
-				end,
-			})
-
-			-- If supported by the client, then highlight all the words that the cursor is
-			if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-				local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
-				vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-					buffer = event.buf,
-					group = highlight_augroup,
-					callback = vim.lsp.buf.document_highlight,
-				})
-
-				vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-					buffer = event.buf,
-					group = highlight_augroup,
-					callback = vim.lsp.buf.clear_references,
-				})
-			end
-
-			vim.api.nvim_create_autocmd("LspDetach", {
-				group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
-				callback = function(event2)
-					vim.lsp.buf.clear_references()
-					pcall(function()
-						vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = event2.buf })
-						vim.api.nvim_del_autocmd(cmd1)
-						vim.api.nvim_del_autocmd(cmd2)
-					end)
-				end,
-			})
-		end
-	end,
-})
-
 -- lsp diagnostics
 vim.api.nvim_create_autocmd({ "CursorHold" }, {
 	group = vim.api.nvim_create_augroup("float_diagnostic_cursor", { clear = true }),
@@ -141,6 +66,7 @@ lsp.html.setup({
 })
 
 require("tailwind-tools").setup({
+	filetypes = { "css", "html", "htm" },
 	capabilities = getcap(),
 	root_dir = function(fname)
 		return util.root_pattern("tailwind.config.mjs")(fname)
@@ -162,20 +88,49 @@ local function root_pattern_excludes(opt)
 	end
 end
 
+require("lspconfig").zls.setup({
+	capabilities = getcap(),
+})
+
 lsp.denols.setup({
 	capabilities = getcap(),
 	root_dir = root_pattern_excludes({
-		root = "deno.json",
-		exclude = "package.json",
+		root = "deno.lock",
+		exclude = "tsconfig.json",
 	}),
+})
+
+-- lsp.ts_ls.setup({
+-- 	capabilities = getcap(),
+-- 	root_dir = function(filename, bufnr)
+-- 		local denoRootDir = lsp.util.root_pattern("deno.json", "deno.json", "deno.lock")(filename)
+-- 		if denoRootDir then
+-- 			-- print('this seems to be a deno project; returning nil so that tsserver does not attach');
+-- 			return nil
+-- 			-- else
+-- 			-- print('this seems to be a ts project; return root dir based on package.json')
+-- 		end
+--
+-- 		return lsp.util.root_pattern("package.json")(filename)
+-- 	end,
+-- 	single_file_support = false,
+-- })
+
+-- npm install -g @astrojs/language-server
+lsp.astro.setup({
+	capabilities = getcap(),
+	filetypes = { "astro" },
+	root_dir = function(fname)
+		return util.root_pattern("astro.config.mjs", "astro.config.ts")(fname)
+	end,
 })
 
 require("typescript-tools").setup({
 	capabilities = getcap(),
 	single_file_support = false,
 	root_dir = root_pattern_excludes({
-		root = "package.json",
-		exclude = "deno.json",
+		root = "tsconfig.json",
+		exclude = "deno.lock",
 	}),
 	settings = {
 		-- spawn additional tsserver instance to calculate diagnostics on it
@@ -220,12 +175,6 @@ require("typescript-tools").setup({
 			filetypes = { "javascriptreact", "typescriptreact" },
 		},
 	},
-})
-
--- npm install -g @astrojs/language-server
-lsp.astro.setup({
-	capabilities = getcap(),
-	filetypes = { "astro" },
 })
 
 lsp.cssls.setup({
@@ -301,7 +250,7 @@ lsp.biome.setup({
 		"typescript",
 		"typescriptreact",
 		"vue",
-		"astro",
+		-- "astro",
 	},
 })
 
@@ -316,8 +265,8 @@ require("roslyn").setup({
 		single_file_support = false,
 		capabilities = getcap(),
 		filetypes = { "cs", "csproj", "sln", "csharp" },
+		-- root_dir = root_pattern_excludes({ root = "*.sln", exclude = "*.fsproj" }),
 		cmd = {},
-		autostart = true,
 		settings = {
 			["csharp|background_analysis"] = {
 				dotnet_analyzer_diagnostics_scope = "fullSolution",
@@ -342,4 +291,96 @@ require("roslyn").setup({
 			},
 		},
 	},
+})
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
+	callback = function(event)
+		local bufnr = event.buf
+		local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+		if client and vim.tbl_contains({ "null-ls" }, client.name) then
+			return
+		end
+
+		require("lsp_signature").on_attach({}, bufnr)
+
+		local opts = {
+			toggle_key = "<leader>kt",
+			dock_toggle_key = "<leader>kd",
+			debounce_time = 15,
+			auto_close = true,
+			silent = true,
+		}
+
+		require("signup").setup(opts)
+
+		local map = function(keys, func, desc, mode)
+			mode = mode or "n"
+			vim.keymap.set(mode, keys, func, {
+				silent = true,
+				buffer = event.buf,
+				desc = "[L]SP: " .. desc,
+			})
+		end
+
+		map("<leader>ls", vim.lsp.buf.signature_help, "signature")
+		map("<leader>lh", vim.lsp.buf.hover, "hover")
+		map("<leader>lf", vim.lsp.buf.format, "format")
+		map("<leader>la", vim.lsp.buf.code_action, "code action")
+		map("<leader>le", vim.lsp.buf.definition, "definition")
+		map("<leader>lc", vim.lsp.buf.declaration, "declaration")
+		map("<leader>lt", vim.lsp.buf.type_definition, "type inspection")
+		map("<leader>li", vim.lsp.buf.implementation, "implementation")
+		map("<leader>lr", vim.lsp.buf.references, "references")
+		map("<leader>ln", vim.lsp.buf.rename, "rename")
+
+		if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+			-- Show inlay_hint by default unless in Insert mode
+			vim.lsp.inlay_hint.enable(true)
+
+			local cmd1 = vim.api.nvim_create_autocmd({ "InsertEnter" }, {
+				callback = function()
+					vim.lsp.inlay_hint.enable(false)
+				end,
+			})
+
+			local cmd2 = vim.api.nvim_create_autocmd({ "InsertLeavePre" }, {
+				callback = function()
+					vim.lsp.inlay_hint.enable(true)
+				end,
+			})
+
+			-- If supported by the client, then highlight all the words that the cursor is
+			if client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+				local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
+				vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
+					buffer = event.buf,
+					group = highlight_augroup,
+					callback = vim.lsp.buf.document_highlight,
+				})
+
+				vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+					buffer = event.buf,
+					group = highlight_augroup,
+					callback = vim.lsp.buf.clear_references,
+				})
+			end
+
+			vim.api.nvim_create_autocmd("LspDetach", {
+				group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
+				callback = function(event2)
+					vim.lsp.buf.clear_references()
+					pcall(function()
+						vim.api.nvim_clear_autocmds({
+							group = "lsp-highlight",
+							buffer = event2.buf,
+						})
+						vim.api.nvim_del_autocmd(cmd1)
+						vim.api.nvim_del_autocmd(cmd2)
+					end)
+				end,
+			})
+		end
+	end,
 })
